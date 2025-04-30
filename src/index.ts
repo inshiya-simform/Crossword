@@ -3,31 +3,44 @@ import { $ } from "./util";
 
 const gridElement = document.getElementById("grid")!;
 
+const crossword = new Crossword();
 function renderGrid(){
-    const crossword = new Crossword();
     const crosswordGrid = crossword.generateCrossword();
     crosswordGrid.forEach((row,rowIndex)=>{
         const rowElement = document.createElement('ul');
+        rowElement.id = 'crossword-ul'
         row.forEach((cell,colIndex)=>{
-            const inputElemet = document.createElement('input');
+            const inputElement = document.createElement('input');
             const wordIdElement = document.createElement('p');
             wordIdElement.textContent = crossword.getIdByPosition(rowIndex,colIndex);
             $(wordIdElement).css('color','black').css('position','absolute').css('top','0%').css('left','0%').css('padding','0').css('margin','0');
-            inputElemet.type = 'text'
-            inputElemet.className = cell ? 'active' : 'inactive';
-            if(inputElemet.className === 'inactive'){
-                inputElemet.disabled =true
+            inputElement.type = 'text'
+            inputElement.className = cell ? 'active' : 'inactive';
+            if(inputElement.className === 'inactive'){
+                inputElement.disabled =true
             }else{
-                inputElemet.disabled = false;
+                inputElement.disabled = false;
             }
-            inputElemet.maxLength = 1;
+            inputElement.maxLength = 1;
             const liElement = document.createElement('li');
             liElement.appendChild(wordIdElement);
-            liElement.appendChild(inputElemet);
+            liElement.appendChild(inputElement);
             rowElement.appendChild(liElement);
         })
         gridElement.appendChild(rowElement);
     })
 }
-    
+
+function renderClues(){
+    const clues = crossword.getClues();
+    const clueListElement = document.getElementById('clues');
+
+    clues.forEach((clue)=>{
+        const liElement = document.createElement('li');
+        liElement.textContent = clue.id + ". " +clue.clue;
+        $(liElement).css('color','white');
+        clueListElement?.appendChild(liElement)
+    })
+}
 renderGrid();
+renderClues();

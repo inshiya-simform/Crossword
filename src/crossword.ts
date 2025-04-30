@@ -7,14 +7,20 @@ type Position={
     row:number,
     col:number
 }[]
+type Clue={
+    id:number,
+    clue:string,
+}[]
+
 export class Crossword {
     size:number;
     grid:string[][];
     positions:Position = [];
+    clues:Clue =[];
     constructor(){
         this.size = GRID_SIZE;
         this.grid = generateInitialGrid();
-        this.positions = this.getStartPositions();
+        this.populatePositionAndClues();
     }
     getIdByPosition(rowIndex:number,colIndex:number):string | null{
         const element= this.positions.find((element)=>element.row === rowIndex && element.col === colIndex)
@@ -31,15 +37,21 @@ export class Crossword {
         })
         return this.grid;
     }
-    private getStartPositions(){
+    getClues(){
+        return this.clues;
+    }
+    private populatePositionAndClues(){
         data.forEach((element)=>{
             this.positions.push({
                 id: element.id,
                 row: element.row,
                 col: element.col
             })
+            this.clues.push({
+                id:element.id,
+                clue:element.clue
+            })
         })
-        return this.positions
     }
     private placeWordVertically(word:string, row:number, col:number){
         if(row + word.length > this.size){
