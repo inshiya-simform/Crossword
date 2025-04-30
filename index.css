@@ -10,6 +10,10 @@ h1{
     padding: 0;
     margin: 0;
     display: flex;
+    overflow: hidden;
+}
+ul{
+    padding:0
 }
 li{
     list-style: none;
@@ -45,11 +49,4 @@ input{
 .inactive:focus, .inactive:disabled{
     outline: none;
     cursor: not-allowed;
-}
-
-@media only screen and (max-width: 1200px) {
-    input{
-        width: 20px;
-        height: 20px;
-    };
 }

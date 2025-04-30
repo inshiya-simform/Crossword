@@ -22,3 +22,21 @@ export function $(element:HTMLElement){
         }
     }
 }
+
+export function move(x: number, y: number, rowIndex: number, colIndex: number) {
+    const newRowIndex = rowIndex + x;
+    const newColIndex = colIndex + y;
+    if (
+      newRowIndex >= 0 &&
+      newRowIndex < GRID_SIZE &&
+      newColIndex >= 0 &&
+      newColIndex < GRID_SIZE
+    ) {
+      const nextInput = document.getElementById(
+        `li-${newRowIndex}${newColIndex}`,
+      )!;
+      if (nextInput && !nextInput.hasAttribute("disabled")) {
+        nextInput.focus();
+      }
+    }
+  }

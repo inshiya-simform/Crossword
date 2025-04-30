@@ -1,16 +1,33 @@
-import { ARROWCONTROLS, GRID_SIZE } from "./constant";
+import { ARROWCONTROLS } from "./constant";
 import { Crossword } from "./crossword";
-import { $ } from "./util";
+import { $, move } from "./util";
+
+type Progress = {
+  id: number;
+  word: string;
+}[];
 
 const gridElement = document.getElementById("grid")!;
 const crossword = new Crossword();
+
+const progress:Progress =[];
 
 function handlechange(e: Event, rowIndex: number, colIndex: number) {
   if (e.target instanceof HTMLInputElement) {
     if (e.target.value === crossword.checkLetterAt(rowIndex, colIndex)) {
       $(e.target).css("background-color", "rgba(99, 242, 137,0.5)");
     }
-    const id = crossword.getPositionById(rowIndex, colIndex);
+    const id = crossword.getNearestIdByPosition(rowIndex, colIndex);
+    const progressObject = progress.find((current) => current.id === Number(id));
+    if(progressObject){
+        progressObject.word += e.target.value
+    }else{
+        progress.push({
+            id: Number(id),
+            word: e.target.value
+        })
+    }
+    localStorage.setItem('progress',JSON.stringify(progress))
     const nextPos = crossword.getNextPosition(Number(id), rowIndex, colIndex)!;
     const nextElement = document.getElementById(`${nextPos.row}${nextPos.col}`);
     if (nextElement) {
@@ -40,17 +57,13 @@ function handleKeyControl(
   }
 }
 
-function move(x: number, y: number, rowIndex: number, colIndex: number) {
-    const newRowIndex = rowIndex + x;
-    const newColIndex = colIndex + y;
-    if((newRowIndex>=0 && newRowIndex < GRID_SIZE )&& (newColIndex >=0 && newColIndex < GRID_SIZE)){
-        const nextInput = document.getElementById(`li-${newRowIndex}${newColIndex}`)!;
-        if(nextInput && !nextInput.hasAttribute('disabled')){
-            nextInput.focus();
-        }
+function getWordById(id:number){
+    const storedProgress = JSON.parse(localStorage.getItem('progress')!)
+    const progressInfo = storedProgress.find((progress:Progress[number])=>progress.id === id)
+    if(progressInfo){
+        return progressInfo.word
     }
 }
-
 function renderGrid() {
   const crosswordGrid = crossword.generateCrossword();
   crosswordGrid.forEach((row, rowIndex) => {
@@ -59,6 +72,13 @@ function renderGrid() {
     row.forEach((cell, colIndex) => {
       const inputElement = document.createElement("input");
       inputElement.id = `${rowIndex}${colIndex}`;
+      const id = crossword.getNearestIdByPosition(rowIndex,colIndex)!;
+        if(id){
+            const word = getWordById(id);
+            if(word){
+                inputElement.value = word.split('')[0]
+            }
+        }
       inputElement.addEventListener("input", (e: Event) =>
         handlechange(e, rowIndex, colIndex),
       );

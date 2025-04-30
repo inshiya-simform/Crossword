@@ -28,7 +28,7 @@ export class Crossword {
     getNextPosition(id:number,rowIndex:number,colIndex:number){
         const element = data.find((element)=>element.id === id)
         if(element){
-            if(element.dir === 'vertical'){
+            if(element.dir === VERTICAL){
                 const nextRow = rowIndex + 1;
                 if(nextRow > GRID_SIZE){
                     throw new Error('Out of bound')
@@ -54,6 +54,34 @@ export class Crossword {
         if(element){return element.id.toString()}
         else return null
     }
+    getNearestIdByPosition(row: number, col: number): number | null {
+        let minDistance = Infinity;
+        let closestId: number | null = null;
+       
+        for (const element of data) {
+          const { id, word, row: startRow, col: startCol, dir } = element;
+       
+          if (dir === HORIZONTAL) {
+            if (row === startRow && col >= startCol && col < startCol + word.length) {
+              const distance = Math.abs(col - startCol);
+              if (distance < minDistance) {
+                minDistance = distance;
+                closestId = id;
+              }
+            }
+          } else if (dir === VERTICAL) {
+            if (col === startCol && row >= startRow && row < startRow + word.length) {
+              const distance = Math.abs(row - startRow);
+              if (distance < minDistance) {
+                minDistance = distance;
+                closestId = id;
+              }
+            }
+          }
+        }
+       
+        return closestId;
+      }
     getPositionById(rowIndex:number,colIndex:number){
         const element= data.find((element)=>{
             if(element.dir === VERTICAL){
