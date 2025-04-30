@@ -1,46 +1,107 @@
+import { ARROWCONTROLS, GRID_SIZE } from "./constant";
 import { Crossword } from "./crossword";
 import { $ } from "./util";
 
 const gridElement = document.getElementById("grid")!;
-
 const crossword = new Crossword();
-function renderGrid(){
-    const crosswordGrid = crossword.generateCrossword();
-    crosswordGrid.forEach((row,rowIndex)=>{
-        const rowElement = document.createElement('ul');
-        rowElement.id = 'crossword-ul'
-        row.forEach((cell,colIndex)=>{
-            const inputElement = document.createElement('input');
-            const wordIdElement = document.createElement('p');
-            wordIdElement.textContent = crossword.getIdByPosition(rowIndex,colIndex);
-            $(wordIdElement).css('color','black').css('position','absolute').css('top','0%').css('left','0%').css('padding','0').css('margin','0');
-            inputElement.type = 'text'
-            inputElement.className = cell ? 'active' : 'inactive';
-            if(inputElement.className === 'inactive'){
-                inputElement.disabled =true
-            }else{
-                inputElement.disabled = false;
-            }
-            inputElement.maxLength = 1;
-            const liElement = document.createElement('li');
-            liElement.appendChild(wordIdElement);
-            liElement.appendChild(inputElement);
-            rowElement.appendChild(liElement);
-        })
-        gridElement.appendChild(rowElement);
-    })
+
+function handlechange(e: Event, rowIndex: number, colIndex: number) {
+  if (e.target instanceof HTMLInputElement) {
+    if (e.target.value === crossword.checkLetterAt(rowIndex, colIndex)) {
+      $(e.target).css("background-color", "rgba(99, 242, 137,0.5)");
+    }
+    const id = crossword.getPositionById(rowIndex, colIndex);
+    const nextPos = crossword.getNextPosition(Number(id), rowIndex, colIndex)!;
+    const nextElement = document.getElementById(`${nextPos.row}${nextPos.col}`);
+    if (nextElement) {
+      nextElement.focus();
+    }
+  }
 }
 
-function renderClues(){
-    const clues = crossword.getClues();
-    const clueListElement = document.getElementById('clues');
+function handleKeyControl(
+  e: KeyboardEvent,
+  rowIndex: number,
+  colIndex: number,
+) {
+  switch (e.key) {
+    case ARROWCONTROLS.ArrowUp:
+      move(-1, 0, rowIndex, colIndex);
+      break;
+    case ARROWCONTROLS.ArrowDown:
+      move(1, 0, rowIndex, colIndex);
+      break;
+    case ARROWCONTROLS.ArrowLeft:
+      move(0, -1, rowIndex, colIndex);
+      break;
+    case ARROWCONTROLS.ArrowRight:
+      move(0, 1, rowIndex, colIndex);
+      break;
+  }
+}
 
-    clues.forEach((clue)=>{
-        const liElement = document.createElement('li');
-        liElement.textContent = clue.id + ". " +clue.clue;
-        $(liElement).css('color','white');
-        clueListElement?.appendChild(liElement)
-    })
+function move(x: number, y: number, rowIndex: number, colIndex: number) {
+    const newRowIndex = rowIndex + x;
+    const newColIndex = colIndex + y;
+    if((newRowIndex>=0 && newRowIndex < GRID_SIZE )&& (newColIndex >=0 && newColIndex < GRID_SIZE)){
+        const nextInput = document.getElementById(`li-${newRowIndex}${newColIndex}`)!;
+        if(nextInput && !nextInput.hasAttribute('disabled')){
+            nextInput.focus();
+        }
+    }
+}
+
+function renderGrid() {
+  const crosswordGrid = crossword.generateCrossword();
+  crosswordGrid.forEach((row, rowIndex) => {
+    const rowElement = document.createElement("ul");
+    rowElement.id = "crossword-ul";
+    row.forEach((cell, colIndex) => {
+      const inputElement = document.createElement("input");
+      inputElement.id = `${rowIndex}${colIndex}`;
+      inputElement.addEventListener("input", (e: Event) =>
+        handlechange(e, rowIndex, colIndex),
+      );
+      inputElement.addEventListener("keydown", (e) =>
+        handleKeyControl(e, rowIndex, colIndex),
+      );
+      const wordIdElement = document.createElement("p");
+      wordIdElement.textContent = crossword.startAt(rowIndex, colIndex);
+      $(wordIdElement)
+        .css("color", "black")
+        .css("position", "absolute")
+        .css("top", "0%")
+        .css("left", "0%")
+        .css("padding", "0")
+        .css("margin", "0");
+      inputElement.type = "text";
+      inputElement.className = cell ? "active" : "inactive";
+      if (inputElement.className === "inactive") {
+        inputElement.disabled = true;
+      } else {
+        inputElement.disabled = false;
+      }
+      inputElement.maxLength = 1;
+      const liElement = document.createElement("li");
+      liElement.id = `li-${rowIndex}${colIndex}`;
+      liElement.appendChild(wordIdElement);
+      liElement.appendChild(inputElement);
+      rowElement.appendChild(liElement);
+    });
+    gridElement.appendChild(rowElement);
+  });
+}
+
+function renderClues() {
+  const clues = crossword.getClues();
+  const clueListElement = document.getElementById("clues");
+
+  clues.forEach((clue) => {
+    const liElement = document.createElement("li");
+    liElement.textContent = clue.id + ". " + clue.clue;
+    $(liElement).css("color", "white");
+    clueListElement?.appendChild(liElement);
+  });
 }
 renderGrid();
 renderClues();

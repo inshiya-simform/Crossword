@@ -26,9 +26,15 @@ input{
 }
 .main-container{
     display: flex;
+    justify-content: center;
+    margin: auto;
 }
 #grid{
     display: grid;
+    flex: 2;
+}
+#clues{
+    flex: 1;
 }
 .active{
     background-color: white;
@@ -39,4 +45,11 @@ input{
 .inactive:focus, .inactive:disabled{
     outline: none;
     cursor: not-allowed;
+}
+
+@media only screen and (max-width: 1200px) {
+    input{
+        width: 20px;
+        height: 20px;
+    };
 }
