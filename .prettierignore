@@ -1,0 +1,6 @@
+dist/
+eslint.config.mjs
+tsconfig.json
+package.json
+package-lock.json
+.prettierrc
