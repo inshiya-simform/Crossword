@@ -1,4 +1,4 @@
-import { GRID_SIZE } from "./constant";
+import { GRID_SIZE, HORIZONTAL, VERTICAL } from "./constant";
 import { data } from "./data";
 import { generateInitialGrid } from "./util";
 
@@ -22,14 +22,61 @@ export class Crossword {
         this.grid = generateInitialGrid();
         this.populatePositionAndClues();
     }
-    getIdByPosition(rowIndex:number,colIndex:number):string | null{
-        const element= this.positions.find((element)=>element.row === rowIndex && element.col === colIndex)
+    checkLetterAt(rowIndex:number,colIndex:number){
+        return this.grid[rowIndex][colIndex]
+    }
+    getNextPosition(id:number,rowIndex:number,colIndex:number){
+        const element = data.find((element)=>element.id === id)
+        if(element){
+            if(element.dir === 'vertical'){
+                const nextRow = rowIndex + 1;
+                if(nextRow > GRID_SIZE){
+                    throw new Error('Out of bound')
+                }
+                return {
+                    row: nextRow,
+                    col: colIndex
+                }
+            }else{
+                const nextCol = colIndex + 1;
+                if(nextCol > GRID_SIZE){
+                    throw new Error('Out of bound')
+                }
+                return {
+                    row: rowIndex,
+                    col: nextCol
+                }
+            }
+        }
+    }
+    startAt(rowIndex:number,colIndex:number):string | null{
+        const element= this.positions.find((element)=>element.row === rowIndex  && element.col === colIndex)
+        if(element){return element.id.toString()}
+        else return null
+    }
+    getPositionById(rowIndex:number,colIndex:number){
+        const element= data.find((element)=>{
+            if(element.dir === VERTICAL){
+                if(colIndex >= element.col && colIndex < element.word.length){
+                    return true
+                }else{
+                    return false
+                }
+            }
+            else if (element.dir === HORIZONTAL){
+                if(rowIndex >= element.row && rowIndex < element.word.length){
+                    return true
+                }else{
+                    return false
+                }
+            }
+        })
         if(element){return element.id.toString()}
         else return null
     }
     generateCrossword(){
         data.forEach((element)=>{
-            if(element.dir === "vertical"){
+            if(element.dir === VERTICAL){
                 this.placeWordVertically(element.word,element.row,element.col);
             }else{
                 this.placeWordHorizontally(element.word,element.row,element.col);
