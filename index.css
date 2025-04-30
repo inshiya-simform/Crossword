@@ -1,0 +1,42 @@
+body{
+    background-color: black;
+}
+h1{
+    color: white;
+    font-size: 3rem;
+    text-align: center;
+}
+ul{
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+li{
+    list-style: none;
+    position: relative;
+}
+input{
+    background-color: none;
+    border: 1px solid black;
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+    font-weight: bold;
+    text-indent: calc(15);
+}
+.main-contaienr{
+    display: flex;
+}
+#grid{
+    display: grid;
+}
+.active{
+    background-color: white;
+}
+.inactive{
+    background-color: lightgrey;
+}
+.inactive:focus, .inactive:disabled{
+    outline: none;
+    cursor: not-allowed;
+}
